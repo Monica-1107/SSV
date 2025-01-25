@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stories by Yashaswi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #1a1a2e;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb);
+            color: white;
+            animation: gradient 6s infinite;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .story {
+            background: #0f3460;
+            color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .story h3 {
+            margin: 0;
+        }
+
+        .story button {
+            background: #fad0c4;
+            border: none;
+            padding: 10px 15px;
+            color: #0f3460;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-right: 5px;
+            transition: background 0.3s;
+        }
+
+        .story button:hover {
+            background: #fff;
+        }
+
+        #stories-container {
+            margin-top: 20px;
+        }
+
+        .chapter {
+            margin-left: 20px;
+            padding: 5px;
+        }
+
+        .chapter button {
+            background: #fad0c4;
+            border: none;
+            padding: 5px 10px;
+            color: #0f3460;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .chapter button:hover {
+            background: #fff;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background: #0f3460;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #0f3460;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        .popup h3 {
+            margin-top: 0;
+        }
+
+        .popup textarea {
+            width: 100%;
+            height: 150px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            padding: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .popup button {
+            background: #fad0c4;
+            border: none;
+            padding: 10px 15px;
+            color: #0f3460;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .popup button:hover {
+            background: #fff;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+
+        nav {
+            background: #0f3460;
+            padding: 10px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fad0c4;
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        nav ul li a:hover {
+            background: #fad0c4;
+            color: #0f3460;
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#" class="logo">Stories by Yashaswi</a>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <h1>Stories by Yashaswi</h1>
+        <p>A Space for Beautiful Tales</p>
+    </header>
+    <div id="app">
+        <button onclick="addStoryUI()">Add Story</button>
+        <div id="stories-container"></div>
+    </div>
+    
+    <div class="container" id="stories-container">
+        <!-- Stories will be dynamically added here -->
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Stories by Yashaswi</p>
+    </footer>
+        <script>
+            let stories = [];
+    
+            function addStoryUI() {
+                const container = document.getElementById("stories-container");
+                const storyTitle = prompt("Enter Story Title", "Story " + (stories.length + 1));
+                const story = {
+                    id: `story-${Date.now()}`,
+                    title: storyTitle,
+                    chapters: []
+                };
+                stories.push(story);
+                renderStories();
+            }
+    
+            function deleteStory(storyId) {
+                stories = stories.filter(story => story.id !== storyId);
+                renderStories();
+            }
+    
+            function showStoryOptions(storyId) {
+                const story = stories.find(story => story.id === storyId);
+                if (!story) return;
+                const optionsContainer = document.getElementById(`${storyId}-options`);
+                if (optionsContainer.style.display === "none") {
+                    optionsContainer.style.display = "block";
+                } else {
+                    optionsContainer.style.display = "none";
+                }
+            }
+    
+            function updateStoryTitle(storyId) {
+                const story = stories.find(story => story.id === storyId);
+                const newTitle = prompt("Enter new title", story.title);
+                if (newTitle) {
+                    story.title = newTitle;
+                    renderStories();
+                }
+            }
+    
+            function addChapter(storyId) {
+                const chapterName = "Chapter " + (stories.find(s => s.id === storyId).chapters.length + 1);
+                const fileInput = document.createElement("input");
+                fileInput.type = "file";
+                fileInput.accept = "application/pdf";
+                fileInput.onchange = (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            const story = stories.find(story => story.id === storyId);
+                            story.chapters.push({
+                                id: `chapter-${Date.now()}`,
+                                name: chapterName,
+                                pdf: reader.result // Store the base64 PDF string here
+                            });
+                            renderStories();
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                fileInput.click();
+            }
+    
+            function updateChapter(storyId, chapterId) {
+                const story = stories.find(story => story.id === storyId);
+                const chapter = story.chapters.find(chap => chap.id === chapterId);
+                if (chapter) {
+                    const fileInput = document.createElement("input");
+                    fileInput.type = "file";
+                    fileInput.accept = "application/pdf";
+                    fileInput.onchange = (event) => {
+                        const file = event.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                                chapter.pdf = reader.result; // Update the PDF file
+                                renderStories();
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    };
+                    fileInput.click();
+                }
+            }
+    
+            function deleteChapter(storyId, chapterId) {
+                const story = stories.find(story => story.id === storyId);
+                if (story) {
+                    story.chapters = story.chapters.filter(chap => chap.id !== chapterId);
+                    renderStories();
+                }
+            }
+    
+            function renderStories() {
+                const container = document.getElementById("stories-container");
+                container.innerHTML = "";
+                stories.forEach(story => {
+                    const storyDiv = document.createElement("div");
+                    storyDiv.classList.add("story");
+                    storyDiv.innerHTML = `
+                        <h3>${story.title}</h3>
+                        <button onclick="showChapters('${story.id}')">Read Story</button>
+                        <button onclick="showStoryOptions('${story.id}')">Manage Story</button>
+                        <button onclick="deleteStory('${story.id}')">Delete Story</button>
+                        <button onclick="updateStoryTitle('${story.id}')">Update Title</button>
+                        <div id="${story.id}-chapters" style="display:none; margin-left:20px;"></div>
+                        <div id="${story.id}-options" style="display:none; margin-left:20px;">
+                            <button onclick="addChapter('${story.id}')">Add Chapter</button>
+                            <div id="${story.id}-chapter-options"></div>
+                        </div>
+                    `;
+                    container.appendChild(storyDiv);
+    
+                    const optionsContainer = document.getElementById(`${story.id}-options`);
+                    if (optionsContainer) {
+                        story.chapters.forEach(chapter => {
+                            const chapterOptionDiv = document.createElement("div");
+                            chapterOptionDiv.classList.add("chapter");
+                            chapterOptionDiv.innerHTML = `
+                                <p>${chapter.name}</p>
+                                <button onclick="updateChapter('${story.id}', '${chapter.id}')">Update Chapter</button>
+                                <button onclick="deleteChapter('${story.id}', '${chapter.id}')">Delete Chapter</button>
+                            `;
+                            optionsContainer.appendChild(chapterOptionDiv);
+                        });
+                    }
+                });
+            }
+    
+            function showChapters(storyId) {
+                const story = stories.find(story => story.id === storyId);
+                if (!story) return;
+                const chaptersDiv = document.getElementById(`${storyId}-chapters`);
+                if (chaptersDiv.style.display === "none") {
+                    chaptersDiv.style.display = "block";
+                    chaptersDiv.innerHTML = "";
+                    story.chapters.forEach(chapter => {
+                        const chapterDiv = document.createElement("div");
+                        chapterDiv.classList.add("chapter");
+                        chapterDiv.innerHTML = `
+                            <p>${chapter.name}</p>
+                            <button onclick="openPDF('${chapter.pdf}')">Read Chapter</button>
+                        `;
+                        chaptersDiv.appendChild(chapterDiv);
+                    });
+                } else {
+                    chaptersDiv.style.display = "none";
+                }
+            }
+    
+            function openPDF(pdfData) {
+                const blob = new Blob([new Uint8Array(atob(pdfData.split(',')[1]).split("").map(c => c.charCodeAt(0)))], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+            }
+        </script>
+
+</body>
+</html>

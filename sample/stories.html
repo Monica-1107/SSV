@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stories by Yashaswi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #stories-container {
+            margin-top: 20px;
+        }
+        .story {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .story h3 {
+            margin: 0;
+        }
+        .chapter {
+            margin-left: 20px;
+            padding: 5px;
+        }
+        .chapter button {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <button onclick="addStoryUI()">Add Story</button>
+        <div id="stories-container"></div>
+    </div>
+
+    <script>
+        let stories = [];
+
+        function addStoryUI() {
+            const container = document.getElementById("stories-container");
+            const storyTitle = prompt("Enter Story Title", "Story " + (stories.length + 1));
+            const story = {
+                id: `story-${Date.now()}`,
+                title: storyTitle,
+                chapters: []
+            };
+            stories.push(story);
+            renderStories();
+        }
+
+        function deleteStory(storyId) {
+            stories = stories.filter(story => story.id !== storyId);
+            renderStories();
+        }
+
+        function showStoryOptions(storyId) {
+            const story = stories.find(story => story.id === storyId);
+            if (!story) return;
+            const optionsContainer = document.getElementById(`${storyId}-options`);
+            if (optionsContainer.style.display === "none") {
+                optionsContainer.style.display = "block";
+            } else {
+                optionsContainer.style.display = "none";
+            }
+        }
+
+        function updateStoryTitle(storyId) {
+            const story = stories.find(story => story.id === storyId);
+            const newTitle = prompt("Enter new title", story.title);
+            if (newTitle) {
+                story.title = newTitle;
+                renderStories();
+            }
+        }
+
+        function addChapter(storyId) {
+            const chapterName = "Chapter " + (stories.find(s => s.id === storyId).chapters.length + 1);
+            const fileInput = document.createElement("input");
+            fileInput.type = "file";
+            fileInput.accept = "application/pdf";
+            fileInput.onchange = (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const story = stories.find(story => story.id === storyId);
+                        story.chapters.push({
+                            id: `chapter-${Date.now()}`,
+                            name: chapterName,
+                            pdf: reader.result // Store the base64 PDF string here
+                        });
+                        renderStories();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            fileInput.click();
+        }
+
+        function updateChapter(storyId, chapterId) {
+            const story = stories.find(story => story.id === storyId);
+            const chapter = story.chapters.find(chap => chap.id === chapterId);
+            if (chapter) {
+                const fileInput = document.createElement("input");
+                fileInput.type = "file";
+                fileInput.accept = "application/pdf";
+                fileInput.onchange = (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                            chapter.pdf = reader.result; // Update the PDF file
+                            renderStories();
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                fileInput.click();
+            }
+        }
+
+        function deleteChapter(storyId, chapterId) {
+            const story = stories.find(story => story.id === storyId);
+            if (story) {
+                story.chapters = story.chapters.filter(chap => chap.id !== chapterId);
+                renderStories();
+            }
+        }
+
+        function renderStories() {
+            const container = document.getElementById("stories-container");
+            container.innerHTML = "";
+            stories.forEach(story => {
+                const storyDiv = document.createElement("div");
+                storyDiv.classList.add("story");
+                storyDiv.innerHTML = `
+                    <h3>${story.title}</h3>
+                    <button onclick="showChapters('${story.id}')">Read Story</button>
+                    <button onclick="showStoryOptions('${story.id}')">Manage Story</button>
+                    <button onclick="deleteStory('${story.id}')">Delete Story</button>
+                    <button onclick="updateStoryTitle('${story.id}')">Update Title</button>
+                    <div id="${story.id}-chapters" style="display:none; margin-left:20px;"></div>
+                    <div id="${story.id}-options" style="display:none; margin-left:20px;">
+                        <button onclick="addChapter('${story.id}')">Add Chapter</button>
+                        <div id="${story.id}-chapter-options"></div>
+                    </div>
+                `;
+                container.appendChild(storyDiv);
+
+                const optionsContainer = document.getElementById(`${story.id}-options`);
+                if (optionsContainer) {
+                    story.chapters.forEach(chapter => {
+                        const chapterOptionDiv = document.createElement("div");
+                        chapterOptionDiv.classList.add("chapter");
+                        chapterOptionDiv.innerHTML = `
+                            <p>${chapter.name}</p>
+                            <button onclick="updateChapter('${story.id}', '${chapter.id}')">Update Chapter</button>
+                            <button onclick="deleteChapter('${story.id}', '${chapter.id}')">Delete Chapter</button>
+                        `;
+                        optionsContainer.appendChild(chapterOptionDiv);
+                    });
+                }
+            });
+        }
+
+        function showChapters(storyId) {
+            const story = stories.find(story => story.id === storyId);
+            if (!story) return;
+            const chaptersDiv = document.getElementById(`${storyId}-chapters`);
+            if (chaptersDiv.style.display === "none") {
+                chaptersDiv.style.display = "block";
+                chaptersDiv.innerHTML = "";
+                story.chapters.forEach(chapter => {
+                    const chapterDiv = document.createElement("div");
+                    chapterDiv.classList.add("chapter");
+                    chapterDiv.innerHTML = `
+                        <p>${chapter.name}</p>
+                        <button onclick="openPDF('${chapter.pdf}')">Read Chapter</button>
+                    `;
+                    chaptersDiv.appendChild(chapterDiv);
+                });
+            } else {
+                chaptersDiv.style.display = "none";
+            }
+        }
+
+        function openPDF(pdfData) {
+            const blob = new Blob([new Uint8Array(atob(pdfData.split(',')[1]).split("").map(c => c.charCodeAt(0)))], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        }
+    </script>
+</body>
+</html>
